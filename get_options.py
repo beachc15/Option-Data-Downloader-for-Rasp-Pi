@@ -5,7 +5,6 @@ import json
 import csv
 import datetime
 from pytz import utc
-from pymongo import MongoClient
 
 
 def keep_index(myListofOptions):
@@ -73,10 +72,10 @@ def main():
 def run_program():
 	current = datetime.datetime.now(tz=utc)
 	weekno = datetime.datetime.today().weekday()
-	if 0 < current.hour < 24 and weekno < 5:
+	if 13 < current.hour < 24 and weekno < 5:
 		file_name = datetime.datetime.now(tz=utc).strftime('%m_%d_%y-%H:%M')
 		inp = main()
-		with open(f'~/Documents/data/options_daily/{file_name}.csv', 'w') as f:
+		with open(f'/home/pi/Documents/data/options_daily/{file_name}.csv', 'w') as f:
 			inp.to_csv(f, index= False)
 		print('****************************************************************')
 		print('*                                                              *')
