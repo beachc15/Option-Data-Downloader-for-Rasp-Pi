@@ -5,36 +5,58 @@ import pandas as pd
 
 
 def main():
-    file_path_check_file = '/home/pi/Documents/data/check_file.csv'
-    file_path_edit = '/home/pi/Documents/data/options_daily/'
-    files_to_fix = []
+	file_path_check_file = '/home/pi/Documents/data/check_file.csv'
+	file_path_edit = '/home/pi/Documents/data/options_daily/'
+	files_to_fix = []
 
-    # get the list of files to fix
-    # files should be seperated by a line with the format {%m_%d_%y-%H:%M}.csv
-    with open(file_path_check_file, 'r') as f:
-        reader = csv.reader(f)
-        for row in reader:
-            files_to_fix.append(row)
+	# get the list of files to fix
+	# files should be seperated by a line with the format {%m_%d_%y-%H:%M}.csv
+	with open(file_path_check_file, 'r') as f:
+		reader = csv.reader(f)
+		for row in reader:
+			files_to_fix.append(row)
 
-    for fn in files_to_fix[0]:
-        fn = fn.strip()
-        print(fn)
-        dir_name = fn.split('-')[0]
-        print('dir name: ', dir_name)
-        file_path = file_path_edit + dir_name + '/' + fn
-        print('file path: ', file_path)
-        df = pd.read_csv(file_path, index_col='uid')
-        check = df.head(1)
-        print(df)
-        if check['currentPriceDay'].isnull:
-            get_price_info(df)
-        else:
-            files_to_fix.pop(fn)
+	for fn in files_to_fix[0]:
+		fn = fn.strip()
+		# print(fn)
+		dir_name = fn.split('-')[0]
+		# print('dir name: ', dir_name)
+		file_path = file_path_edit + dir_name + '/' + fn
+		# print('file path: ', file_path)
+		df = pd.read_csv(file_path, index_col='uid')
+		check = df.head(1)
+		# print(df)
+		if check['currentPriceDay'].isnull:
+			get_price_info(df, fn)
+		else:
+			files_to_fix.pop(fn)
 
 
-def get_price_info(df_):
-    print('got here')
+def get_price_info(df_, file_name):
+	from datetime import time
+
+	def get_yfinance(tickers):
+		import yfinance as yf
+		prices = yf.download(tickers=tickers, interval='1m', period='1d')
+		return prices
+
+	def price_delta_in_pct(strike, current_price):
+		"""finds the percent change necessary from current price to reach strike price"""
+		pct_change = round((strike - current_price) / current_price, 7)
+		return round(pct_change, 7)
+
+	time_as_str = file_name.split('.')[0].split('-')[-1].split(':')
+	time_obj = time(hour=time_as_str[0], minute=time_as_str[1])
+	print('time_obj: ', time_obj)
+	for ind in df_.index:
+		print('ind: ', ind)
+		print('ind time: ', ind.time())
+		if ind.time() == time_obj:
+			print('matched times')
+	stock_list = df_['ticker'].unique()
+	print('unique values: ', stock_list)
+	current_prices = get_yfinance(stock_list)
 
 
 if __name__ == '__main__':
-    main()
+	main()

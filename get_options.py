@@ -100,11 +100,6 @@ def add_price(df, tickers):
                 time_delta_float = cache[(expiration_dt, current_dt)]
             return time_delta_float
 
-        # def price_delta_in_pct(strike, current_price):
-        #     """finds the percent change necessary from current price to reach strike price"""
-        #     pct_change = round((strike - current_price) / current_price, 7)
-        #     return round(pct_change, 7)
-
         df_['timeUntilExpiration'] = df_.apply(
             lambda x: time_to_strike(x['expiration'], x['myDateTime']), axis=1)
         # anything with minute dependent data has to be thrown out as all data is delayed by 15 minutes.
