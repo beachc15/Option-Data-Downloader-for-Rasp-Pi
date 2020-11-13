@@ -148,7 +148,7 @@ def run_program():
         file_name = current.strftime('%m_%d_%y-%H:%M')
 
         with open('/home/pi/Documents/data/check_file.csv', 'a') as fd:
-            fd.write(f'{file_name}.csv')
+            fd.write(f', {file_name}.csv')
 
         inp = main()
         with open(f'/home/pi/Documents/data/options_daily/{str_dt}/{file_name}.csv', 'w')as f:
