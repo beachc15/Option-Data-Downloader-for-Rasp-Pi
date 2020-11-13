@@ -100,10 +100,10 @@ def add_price(df, tickers):
                 time_delta_float = cache[(expiration_dt, current_dt)]
             return time_delta_float
 
-        def price_delta_in_pct(strike, current_price):
-            """finds the percent change necessary from current price to reach strike price"""
-            pct_change = round((strike - current_price) / current_price, 7)
-            return round(pct_change, 7)
+        # def price_delta_in_pct(strike, current_price):
+        #     """finds the percent change necessary from current price to reach strike price"""
+        #     pct_change = round((strike - current_price) / current_price, 7)
+        #     return round(pct_change, 7)
 
         df_['timeUntilExpiration'] = df_.apply(
             lambda x: time_to_strike(x['expiration'], x['myDateTime']), axis=1)
@@ -123,11 +123,14 @@ def add_price(df, tickers):
         prices[price] = prices[price][0]
         volume[price] = volume[price][0]
         '''
+
     df = add_ticker(df)
+
     '''
     df['currentPriceDay'] = df["ticker"].apply(lambda x: prices.get(x))
     df['stockVolumeDay'] = df["ticker"].apply(lambda x: volume.get(x))
     '''
+
     df['currentPriceDay'] = None
     df['stockVolumeDay'] = None
     df = time_to_strike_df(df)
@@ -139,10 +142,14 @@ def run_program():
     weekno = datetime.datetime.today().weekday()
     if 13 < current.hour < 24 and weekno < 5:
         str_dt = current.strftime('%m_%d_%y')
-        myPath = '/home/pi/Documents/data/options_daily/'
-        if not os.path.exists(f'{myPath}/{str_dt}/'):
-            os.makedirs(f'{myPath}/{str_dt}/')
+        my_path = '/home/pi/Documents/data/options_daily/'
+        if not os.path.exists(f'{my_path}/{str_dt}/'):
+            os.makedirs(f'{my_path}/{str_dt}/')
         file_name = current.strftime('%m_%d_%y-%H:%M')
+
+        with open('/home/pi/Documents/data/check_file.csv', 'a') as fd:
+            fd.write(f'{file_name}.csv')
+
         inp = main()
         with open(f'/home/pi/Documents/data/options_daily/{str_dt}/{file_name}.csv', 'w')as f:
             inp.to_csv(f)
