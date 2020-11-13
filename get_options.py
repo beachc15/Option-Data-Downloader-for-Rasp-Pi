@@ -141,11 +141,21 @@ def run_program():
         if not os.path.exists(f'{my_path}/{str_dt}/'):
             os.makedirs(f'{my_path}/{str_dt}/')
         file_name = current.strftime('%m_%d_%y-%H:%M')
-
-        with open('/home/pi/Documents/data/check_file.csv', 'a') as fd:
-            fd.write(f', {file_name}.csv')
+        line = []
 
         inp = main()
+
+        with open('/home/pi/Documents/data/check_file.csv', 'r') as fd:
+            try:
+                line = [x for x in csv.reader(fd)][0]
+                print(line)
+            except IndexError:
+                line = [csv.reader(fd)] 
+            line.append(f'{file_name}.csv')
+        with open('/home/pi/Documents/data/check_file.csv', 'w') as fd:
+            line = list(map(str.strip, line))
+            fd.write(', '.join(line))
+
         with open(f'/home/pi/Documents/data/options_daily/{str_dt}/{file_name}.csv', 'w')as f:
             inp.to_csv(f)
         print('****************************************************************')

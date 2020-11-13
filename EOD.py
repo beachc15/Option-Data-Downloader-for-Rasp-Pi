@@ -12,10 +12,10 @@ def end_of_day_collection():
 	if (21 <= current.hour < 24) and weekno < 5:
 		dt = current.strftime('%Y-%m-%d')
 
-		with open('tickers.csv') as f:
+		with open('/home/pi/python_projects/python_prod/rasbpi_options/tickers.csv') as f:
 			for tickers in csv.reader(f):
 				_ = tickers
-		export = {'date': dt, 'data': yf.download(tickers, interval='5m', start=dt).to_json()}
+		# export = {'date': dt, 'data': yf.download(tickers, interval='5m', start=dt).to_json()}
 		open_str = f"/home/pi/Documents/data/EOD_prices/{dt}.csv"
 		with open(open_str, 'w') as f:
 			yf.download(tickers, interval='5m', start=dt).to_csv(f)	
