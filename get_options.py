@@ -150,11 +150,21 @@ def run_program():
                 line = [x for x in csv.reader(fd)][0]
                 print(line)
             except IndexError:
-                line = [csv.reader(fd)] 
+                line = [x for x in csv.reader(fd)] 
             line.append(f'{file_name}.csv')
         with open('/home/pi/Documents/data/check_file.csv', 'w') as fd:
-            line = list(map(str.strip, line))
-            fd.write(', '.join(line))
+            if isinstance(line, list):
+                print(line)
+                line = list(map(str.strip, line))
+                print(line)
+                fd.write(', '.join(line))
+            elif isinstance(line, str):
+                fd.write(line)
+            else:
+                print('line was not string or list')
+                print(f'line was of type {type(line)}')
+                print(f'contents of line were {line}')
+
 
         with open(f'/home/pi/Documents/data/options_daily/{str_dt}/{file_name}.csv', 'w')as f:
             inp.to_csv(f)

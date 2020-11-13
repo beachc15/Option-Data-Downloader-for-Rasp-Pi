@@ -29,7 +29,17 @@ def main():
                 else:
                     pass
         with open(file_path_check_file, 'w') as f:
-            csv.writer(f).writerow(', '.join(files_to_keep))
+            if isinstance(files_to_keep, list):
+                print(files_to_keep)
+                f.write(', '.join(files_to_keep))
+                # csv.writer(f).writerow(', '.join(files_to_keep))
+            elif isinstance(files_to_keep, str):
+                f.write(files_to_keep)
+                # csv.writer(f).writerow(files_to_keep)
+            else:
+                print("error with writer")
+                print(f"files to keep was {files_to_keep}")
+                print(f"and of type {type(files_to_keep)}")
 
     except IndexError:
         pass
