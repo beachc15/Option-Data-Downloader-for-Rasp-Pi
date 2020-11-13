@@ -135,7 +135,9 @@ def add_price(df, tickers):
 def run_program():
     current = datetime.datetime.now(tz=utc)
     weekno = datetime.datetime.today().weekday()
-    if 13 < current.hour < 24 and weekno < 5:
+    open_time = datetime.time(hour=13, minute=30)
+    close_time = datetime.time(hour=21, minute=30)
+    if open_time < current.time() < close_time and weekno < 5:
         str_dt = current.strftime('%m_%d_%y')
         my_path = '/home/pi/Documents/data/options_daily/'
         if not os.path.exists(f'{my_path}/{str_dt}/'):
@@ -150,7 +152,7 @@ def run_program():
                 line = [x for x in csv.reader(fd)][0]
                 print(line)
             except IndexError:
-                line = [x for x in csv.reader(fd)] 
+                line = [x for x in csv.reader(fd)]
             line.append(f'{file_name}.csv')
         with open('/home/pi/Documents/data/check_file.csv', 'w') as fd:
             if isinstance(line, list):
@@ -164,7 +166,6 @@ def run_program():
                 print('line was not string or list')
                 print(f'line was of type {type(line)}')
                 print(f'contents of line were {line}')
-
 
         with open(f'/home/pi/Documents/data/options_daily/{str_dt}/{file_name}.csv', 'w')as f:
             inp.to_csv(f)
