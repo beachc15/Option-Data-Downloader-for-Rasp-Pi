@@ -135,7 +135,7 @@ def add_price(df, tickers):
 def run_program():
     current = datetime.datetime.now(tz=utc)
     weekno = datetime.datetime.today().weekday()
-    open_time = datetime.time(hour=13, minute=30)
+    open_time = datetime.time(hour=14, minute=30)
     close_time = datetime.time(hour=21, minute=30)
     if open_time < current.time() < close_time and weekno < 5:
         str_dt = current.strftime('%m_%d_%y')
