@@ -17,3 +17,7 @@ Tool for building an options dataset written in Python for deployment on the Ras
 
 # TODO
  - Right now we are losing ~5% of each days data to the following [ChunkedEncodingError](https://github.com/beachc15/Option-Data-Downloader-for-Rasp-Pi/issues/2)
+ - Add to-the-minute accurate pricing of the stock for the time that the option data was recorded
+    - FYI the record datetime is used rather than the lastTradeDate because the record datetime is representative of the going price of the option, rather than the last price that was actuall paid for it.
+    - I would just set it to record this at the time of the original data pull but sometimes the yfinance API doesn't update immediately. 
+    - I am currently (11/28) working on a solution that updates for the whole week each friday. This would lighten the use of the API and speed up the iterative daily computation as it doesn't need to perform 2 web scraping operations for each interval.
