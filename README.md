@@ -15,3 +15,5 @@ Tool for building an options dataset written in Python for deployment on the Ras
   people with similar interests who like discussing things like this. I have a dream of attending a masters program in Computational Finance but I worry my lack of a formal
   coding/math background limits me.**
 
+# TODO
+ - Right now we are losing ~5% of each days data to the following [ChunkedEncodingError]
