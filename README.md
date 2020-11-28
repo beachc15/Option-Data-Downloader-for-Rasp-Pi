@@ -16,4 +16,4 @@ Tool for building an options dataset written in Python for deployment on the Ras
   coding/math background limits me.**
 
 # TODO
- - Right now we are losing ~5% of each days data to the following [ChunkedEncodingError]
+ - Right now we are losing ~5% of each days data to the following [ChunkedEncodingError](https://github.com/beachc15/Option-Data-Downloader-for-Rasp-Pi/issues/2)
