@@ -1,8 +1,28 @@
+"""Updates the previous week's (monday through current day) 'current price', 'current volume', and 'percent
+difference strike from price' columns on dataframes generated from get_options.py
+
+Step by step:
+This script figures out the current date
+figures out monday of this week
+creates a list of all files written to the directories associated with those dates
+in each file, adds the columns mentioned above with accurate data
+
+reasoning: The minute-by-minute pricing information available thorugh yfinance is not available immediately 100% of
+the time. To make sure we dont add a bunch of random 'null' values to our dataframe, this program just adss the whole
+week at once. """
 import csv
-import pandas as pd
-from pytz import utc
 import warnings
 import datetime
+import pandas as pd
+from pytz import utc
+
+__author__ = "Charles Beach"
+__credits__ = "Charles Beach"
+__license__ = "MIT"
+__version__ = "0.8"
+__maintainer__ = "Charles Beach"
+__email__ = "beachc15@gmail.com"
+__status__ = "Development"
 
 
 def main():
@@ -70,10 +90,15 @@ def main():
         # ****** Get list of files *******
         for date in date_list:
             date_path = f'{my_dir_path}/{date}'
-            os.chdir(date_path)
-            for root, dirs, files in os.walk(".", topdown=False):
-                for name in files:
-                    files_list.append(os.path.join(root, name))
+            try:
+                os.chdir(date_path)
+                for root, dirs, files in os.walk(".", topdown=False):
+                    for name in files:
+                        files_list.append(os.path.join(root, name))
+            except FileNotFoundError:
+                warnings.warn(f'Dir not found \'{date_path}\'.', RuntimeWarning)
+                pass
+
         # Checked this function on a windows machine. Have yet to check on my actual raspberry pi
         print('***********************\n\n')
         print('file names')
@@ -110,7 +135,7 @@ def main():
         """
         IMPORTANT: This function actually opens and (potentially permanently) alters the file that is passed into it.
         :param price_vol_df: datetime.date Object
-        :type file_str_: datetime.date Object
+        :type file_str_: str
         :return:
         """
         # data function
@@ -140,8 +165,9 @@ def main():
 
         df = pd.read_csv(file_str_, index_col=df_index_col)
         # TODO add some check to see if this dataframe has already been altered (just in case)
-        #   honestly no this is dumb to check. I will leave it in just in case I change my mind but if its there whats
+        #   honestly no this is dumb to check. I will leave this in just in case I change my mind but if its there whats
         #   the harm in just overwriting it?
+        #   peak efficiency is too expensive for me
 
         # Get recorded time from the file_str file name
         my_time = get_time(file_str_)
