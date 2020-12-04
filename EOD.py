@@ -1,9 +1,18 @@
+"""EOD.py gets the EndOfDay prices for the day. It looks at each stock listed in tickers.csv then pulls the
+minute-by-minute data throughout the whole day on the stock through yfinance. It then saves it in a csv form"""
 import datetime
-
 import yfinance as yf
 import csv
 from pytz import utc
 import json
+
+__author__ = "Charles Beach"
+__credits__ = "Charles Beach"
+__license__ = "MIT"
+__version__ = "0.8"
+__maintainer__ = "Charles Beach"
+__email__ = "beachc15@gmail.com"
+__status__ = "Development"
 
 
 def end_of_day_collection():
@@ -18,12 +27,12 @@ def end_of_day_collection():
 		# export = {'date': dt, 'data': yf.download(tickers, interval='5m', start=dt).to_json()}
 		open_str = f"/home/pi/Documents/data/EOD_prices/{dt}.csv"
 		with open(open_str, 'w') as f:
-			yf.download(tickers, interval='5m', start=dt).to_csv(f)	
+			yf.download(tickers, interval='5m', start=dt).to_csv(f)
 		print()
 		print()
 		print('***********************')
 		print()
-		print(f'Successfully output to ~/Documents/data/EOD_prices/{dt}.json')
+		print(f'Successfully output to ~/Documents/data/EOD_prices/{dt}.csv')
 		print()
 		print('***********************')
 		print()

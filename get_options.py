@@ -1,21 +1,31 @@
-import pandas as pd
-import yfinance as yf
-from tqdm import tqdm
+"""get_options.py pulls data on the stocks listed in tickers.csv and gets the options data on each, combined into one
+dataframe then exported as a csv file. It requires a weekly update from update_price_funcs.py as well """
+
+import os
 import json
 import csv
 import datetime
+import pandas as pd
+import yfinance as yf
+from tqdm import tqdm
 from pytz import utc
-import os
 
+__author__ = "Charles Beach"
+__credits__ = "Charles Beach"
+__license__ = "MIT"
+__version__ = "0.8"
+__maintainer__ = "Charles Beach"
+__email__ = "beachc15@gmail.com"
+__status__ = "Development"
 
-def keep_index(myListofOptions):
+def keep_index(my_list_of_options):
     """ Keep only the middle 50% of rows in the dataframe
     The reasoning for this is that the most in the money and most out of the money options will
     not provide any consistent results"""
     my_index = [0, 1]
     output_list = {}
     for i in my_index:
-        this_obj = myListofOptions[i]
+        this_obj = my_list_of_options[i]
         this_index = len(this_obj.index)
         sixth_of_index = int(this_index / 6)
         two_sixths = int(sixth_of_index * 2)
@@ -24,9 +34,9 @@ def keep_index(myListofOptions):
     return output_list
 
 
-def main():
+def main(ticker_path='/home/pi/python_projects/python_prod/rasbpi_options/tickers.csv'):
     i = 0
-    with open('/home/pi/python_projects/python_prod/rasbpi_options/tickers.csv') as f:
+    with open(ticker_path) as f:
         for tickers in csv.reader(f):
             print(tickers)
     errors = 0
@@ -66,6 +76,8 @@ def main():
                 errors += 1
                 if errors >= 100:
                     print(errors)
+        # This is my way of making sure my CSV file has headers while not trying to hold the whole thing in memory
+        # TODO add below lines to the try statement to avoid the chance of an empty df_out
         i += 1
         if i == 1:
             this_time_export_data = df_out
@@ -132,40 +144,40 @@ def add_price(df, tickers):
     return df
 
 
-def run_program():
+def run_program(export_dir_path='/home/pi/Documents/data/options_daily/'):
     current = datetime.datetime.now(tz=utc)
     weekno = datetime.datetime.today().weekday()
     open_time = datetime.time(hour=14, minute=30)
     close_time = datetime.time(hour=21, minute=30)
     if open_time < current.time() < close_time and weekno < 5:
         str_dt = current.strftime('%m_%d_%y')
-        my_path = '/home/pi/Documents/data/options_daily/'
-        if not os.path.exists(f'{my_path}/{str_dt}/'):
-            os.makedirs(f'{my_path}/{str_dt}/')
+
+        if not os.path.exists(f'{export_dir_path}/{str_dt}/'):
+            os.makedirs(f'{export_dir_path}/{str_dt}/')
         file_name = current.strftime('%m_%d_%y-%H:%M')
-        line = []
+        # line = []
 
         inp = main()
 
-        with open('/home/pi/Documents/data/check_file.csv', 'r') as fd:
-            try:
-                line = [x for x in csv.reader(fd)][0]
-                print(line)
-            except IndexError:
-                line = [x for x in csv.reader(fd)]
-            line.append(f'{file_name}.csv')
-        with open('/home/pi/Documents/data/check_file.csv', 'w') as fd:
-            if isinstance(line, list):
-                print(line)
-                line = list(map(str.strip, line))
-                print(line)
-                fd.write(', '.join(line))
-            elif isinstance(line, str):
-                fd.write(line)
-            else:
-                print('line was not string or list')
-                print(f'line was of type {type(line)}')
-                print(f'contents of line were {line}')
+        # with open('/home/pi/Documents/data/check_file.csv', 'r') as fd:
+        #     try:
+        #         line = [x for x in csv.reader(fd)][0]
+        #         print(line)
+        #     except IndexError:
+        #         line = [x for x in csv.reader(fd)]
+        #     line.append(f'{file_name}.csv')
+        # with open('/home/pi/Documents/data/check_file.csv', 'w') as fd:
+        #     if isinstance(line, list):
+        #         print(line)
+        #         line = list(map(str.strip, line))
+        #         print(line)
+        #         fd.write(', '.join(line))
+        #     elif isinstance(line, str):
+        #         fd.write(line)
+        #     else:
+        #         print('line was not string or list')
+        #         print(f'line was of type {type(line)}')
+        #         print(f'contents of line were {line}')
 
         with open(f'/home/pi/Documents/data/options_daily/{str_dt}/{file_name}.csv', 'w')as f:
             inp.to_csv(f)
