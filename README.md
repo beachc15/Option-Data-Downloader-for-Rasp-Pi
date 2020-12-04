@@ -29,6 +29,8 @@ Tool for building an options dataset written in Python for deployment on the Ras
   **Please, if you find this at all interesting, reach out to me [Beachc15@gmail.com](beachc15@gmail.com). I have been writing code for a few years now and haven't found many
   people with similar interests who like discussing things like this. I have a dream of attending a masters program in Computational Finance but I worry my lack of a formal
   coding/math background limits me.**
+  
+  Also, track my progress on my repo where I work with these files over on [daily option analysis](https://github.com/beachc15/daily-option-analysis)
 
 # TODO
  - *High priority* EOD CSV files are showing the top three rows as 'Adj close', 'ticker', 'data type'. fix to be one row. Index is also showing as a column.
