@@ -10,6 +10,19 @@ Tool for building an options dataset written in Python for deployment on the Ras
   My goal with this project is to use machine learning to predict an option price some certain time in the future and then write an algorithm that trades based on the 
   ML program's findings while the data-puller continuously updates the models on a rolling bases
   
+# Instructions
+
+- Run ```git clone https://github.com/beachc15/Option-Data-Downloader-for-Rasp-Pi``` on your raspberry pi's CLI
+- Set up Crontab to schedule jobs using ```crontab -e``` to open file
+  - At the end of the file add the following two lines to schedule the two main files to run:
+   ```
+   */5 * * * 1-5 </somedir/python3.8 binary> /home/usr/<repo download location>/get_options.py
+   33 * * * 1-5 </somedir/python3.8 binary> /home/usr/<repo download location>/EOD.py
+   
+- Within get_options.py and EOD.py replace the location of [tickers.csv](https://github.com/beachc15/Option-Data-Downloader-for-Rasp-Pi/blob/master/tickers.csv) with the stocks you want to track
+  - Also update the ```my_path``` string in the ```main``` function at the bottom to where you want to store your data
+- At this point it should run without a hitch. Please reach out if any issues.
+  
 # Contact
   **Please, if you find this at all interesting, reach out to me [Beachc15@gmail.com](beachc15@gmail.com). I have been writing code for a few years now and haven't found many
   people with similar interests who like discussing things like this. I have a dream of attending a masters program in Computational Finance but I worry my lack of a formal
