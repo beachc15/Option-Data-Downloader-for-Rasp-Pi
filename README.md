@@ -17,8 +17,10 @@ Tool for building an options dataset written in Python for deployment on the Ras
   - At the end of the file add the following two lines to schedule the two main files to run:
    ```
    */5 * * * 1-5 </somedir/python3.8 binary> /home/usr/<repo download location>/get_options.py
-   33 * * * 1-5 </somedir/python3.8 binary> /home/usr/<repo download location>/EOD.py
-   
+   33 21 * * 1-5 </somedir/python3.8 binary> /home/usr/<repo download location>/EOD.py
+   0 21 * * 5 </somedir/python3.8 binary> /home/usr/<repo download location>/update_price_funcs.py
+   ```
+  - This crontab command will run ```get_options``` every 5 minutes monday through friday, runs ```update_price_funcs.py``` every friday at 9:00 PM and runs ```EOD.py``` at 9:33 PM UTC.
 - Within get_options.py and EOD.py replace the location of [tickers.csv](https://github.com/beachc15/Option-Data-Downloader-for-Rasp-Pi/blob/master/tickers.csv) with the stocks you want to track
   - Also update the ```my_path``` string in the ```main``` function at the bottom to where you want to store your data
 - At this point it should run without a hitch. Please reach out if any issues.
@@ -29,6 +31,7 @@ Tool for building an options dataset written in Python for deployment on the Ras
   coding/math background limits me.**
 
 # TODO
+ - *High priority* EOD CSV files are showing the top three rows as 'Adj close', 'ticker', 'data type'. fix to be one row. Index is also showing as a column.
  - Right now we are losing ~5% of each days data to the following [ChunkedEncodingError](https://github.com/beachc15/Option-Data-Downloader-for-Rasp-Pi/issues/2)
  - Add to-the-minute accurate pricing of the stock for the time that the option data was recorded
     - FYI the record datetime is used rather than the lastTradeDate because the record datetime is representative of the going price of the option, rather than the last price that was actuall paid for it.
