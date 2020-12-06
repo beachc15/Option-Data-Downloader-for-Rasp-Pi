@@ -140,7 +140,7 @@ def main():
         :return:
         """
         # data function
-        def price_delta_in_pct(strike, current_price):
+        def price_delta_in_pct(strike, current_price, ticker):
             """
             Finds the percent change necessary from current price to reach strike price
             :param strike:
@@ -148,6 +148,11 @@ def main():
             :return:
             """
             round_int = 7
+            if ticker == 'BRKB':
+                ticker = 'BRK-B'
+            print('strike: ', strike)
+            print('ticker: ', ticker)
+            print('current price: ', current_price)
             pct_change = (round((strike - current_price) / current_price), round_int)
             return pct_change
 
@@ -177,10 +182,16 @@ def main():
         try:
             for ind in price_vol_df.index:
                 ind_match = ind.astimezone(utc)
+                print('************')
+                print('my time: ', my_time)
+                print('time to match: ', ind_match.time())
+                print('*************')
                 if ind_match.time() == my_time:
                     # confirmed_match is stored as a UNIX timestamp (I think)
                     # TODO confirm line 122
+                    print('MATCH CONFIRMED')
                     confirmed_match = ind
+                    break
 
             # confirmed_match is the index of the row in the stock prices dataframe which we need to use
             # I should make the next part a "try.. except" method but I want to see what happens this way first
@@ -193,14 +204,18 @@ def main():
             # **Transformation**
             df['currentPriceDay'] = df['ticker'].apply(lambda x: adj_close_dict.get(x))
             df['stockVolumeDay'] = df['ticker'].apply(lambda x: volume_dict.get(x))
-            df['pctPriceDiff'] = df.apply(lambda x: price_delta_in_pct(x['strike'], x['currentPriceDay']), axis=1)
+            df['pctPriceDiff'] = df.apply(lambda x: price_delta_in_pct(x['strike'], x['currentPriceDay'], x['ticker']), axis=1)
 
             df.to_csv(path_or_buf=file_str_)
             print(f"finished {file_str_}")
         except ValueError:
-            pass
+            print('VALUE ERROR HERE')
+            print(confirmed_match)
+            print(price_vol_df.loc[confirmed_match])
+            raise ValueError()
         except KeyError:
-            pass
+            print("Key Error")
+            print(price_vol_df)
 
     start, end = get_dates()
     file_list = peruse_dir(start_=start, end_=end)
