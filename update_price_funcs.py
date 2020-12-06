@@ -15,6 +15,7 @@ import warnings
 import datetime
 import pandas as pd
 from pytz import utc
+from tqdm import tqdm
 
 __author__ = "Charles Beach"
 __credits__ = "Charles Beach"
@@ -124,9 +125,8 @@ def main():
         # Get ticker list
         with open(dir_str) as f:
             for tickers_ in csv.reader(f):
-
-                # Weirdly this works for instantiating the tickers object. I know its inefficient but meh.
                 print(tickers_)
+                # Weirdly this works for instantiating the tickers object. I know its inefficient but meh.
 
         # Download data from yfinance
         df_out = yf.download(tickers=tickers_, start=start_, end=end_, interval='1m')
@@ -150,10 +150,10 @@ def main():
             round_int = 7
             if ticker == 'BRKB':
                 ticker = 'BRK-B'
-            print('strike: ', strike)
-            print('ticker: ', ticker)
-            print('current price: ', current_price)
-            pct_change = (round((strike - current_price) / current_price), round_int)
+#            print('strike: ', strike)
+#            print('ticker: ', ticker)
+#            print('current price: ', current_price)
+            pct_change = (strike - current_price) / current_price
             return pct_change
 
         def get_time(file_str__):
@@ -168,7 +168,6 @@ def main():
 
         confirmed_match = False
         df_index_col = 'uid'
-
         df = pd.read_csv(file_str_, index_col=df_index_col)
         # TODO add some check to see if this dataframe has already been altered (just in case)
         #   honestly no this is dumb to check. I will leave this in just in case I change my mind but if its there whats
@@ -182,14 +181,13 @@ def main():
         try:
             for ind in price_vol_df.index:
                 ind_match = ind.astimezone(utc)
-                print('************')
-                print('my time: ', my_time)
-                print('time to match: ', ind_match.time())
-                print('*************')
+#                print('************')
+#                print('my time: ', my_time)
+#                print('time to match: ', ind_match.time())
+#                print('*************')
                 if ind_match.time() == my_time:
                     # confirmed_match is stored as a UNIX timestamp (I think)
                     # TODO confirm line 122
-                    print('MATCH CONFIRMED')
                     confirmed_match = ind
                     break
 
@@ -201,30 +199,26 @@ def main():
             adj_close_dict = price_vol_df.loc[confirmed_match]['Adj Close'].to_dict()
             volume_dict = price_vol_df.loc[confirmed_match]['Volume'].to_dict()
 
+            # **CLEAN**
+            # this part is entirely fixing the ticker portion that says "BRKB instead of BRK-B"
+            search_str = r'^BRKB' 
+            df['ticker'] = df['ticker'].str.replace(pat='BRKB', repl='BRK-B')
             # **Transformation**
             df['currentPriceDay'] = df['ticker'].apply(lambda x: adj_close_dict.get(x))
             df['stockVolumeDay'] = df['ticker'].apply(lambda x: volume_dict.get(x))
+
             df['pctPriceDiff'] = df.apply(lambda x: price_delta_in_pct(x['strike'], x['currentPriceDay'], x['ticker']), axis=1)
 
             df.to_csv(path_or_buf=file_str_)
-            print(f"finished {file_str_}")
-        except ValueError:
-            print('VALUE ERROR HERE')
-            print(confirmed_match)
-            print(price_vol_df.loc[confirmed_match])
-            raise ValueError()
         except KeyError:
-            print("Key Error")
-            print(price_vol_df)
+            print('KeyError')
 
     start, end = get_dates()
     file_list = peruse_dir(start_=start, end_=end)
     df_prices = get_yfinance(start_=start, end_=end)
 
-    for file_str in file_list:
-        print(file_str)
+    for file_str in tqdm(file_list):
         alter_csv(df_prices, file_str)
-
     # at this point we can start checking each file and altering it
     # As of right now I think I am going to pass it into a for loop for each of the file strings in file_list
     # and pass a function that actually goes in and makes the required alteration of the CSV.
