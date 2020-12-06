@@ -8,7 +8,7 @@ creates a list of all files written to the directories associated with those dat
 in each file, adds the columns mentioned above with accurate data
 
 reasoning: The minute-by-minute pricing information available thorugh yfinance is not available immediately 100% of
-the time. To make sure we dont add a bunch of random 'null' values to our dataframe, this program just adss the whole
+the time. To make sure we dont add a bunch of random 'null' values to our dataframe, this program just adds the whole
 week at once. """
 import csv
 import warnings
