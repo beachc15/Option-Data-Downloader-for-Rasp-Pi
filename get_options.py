@@ -18,6 +18,7 @@ __maintainer__ = "Charles Beach"
 __email__ = "beachc15@gmail.com"
 __status__ = "Development"
 
+
 def keep_index(my_list_of_options):
     """ Keep only the middle 50% of rows in the dataframe
     The reasoning for this is that the most in the money and most out of the money options will
@@ -114,29 +115,10 @@ def add_price(df, tickers):
 
         df_['timeUntilExpiration'] = df_.apply(
             lambda x: time_to_strike(x['expiration'], x['myDateTime']), axis=1)
-        # anything with minute dependent data has to be thrown out as all data is delayed by 15 minutes.
-        # Instead this will be run on a seperate job
-        # df_['pctPriceDiff'] = df_.apply(lambda x: price_delta_in_pct(
-        #     x['strike'], x['currentPriceDay']), axis=1)
         df_['pctPriceDiff'] = None
         return df_
 
-    '''
-    df2 = yf.download(tickers, interval='5m', period='5d').tail(1)
-    print(df2)
-    prices = df2['Adj Close'].to_dict('list')
-    volume = df2['Volume'].to_dict('list')
-    for price in prices:
-        prices[price] = prices[price][0]
-        volume[price] = volume[price][0]
-        '''
-
     df = add_ticker(df)
-
-    '''
-    df['currentPriceDay'] = df["ticker"].apply(lambda x: prices.get(x))
-    df['stockVolumeDay'] = df["ticker"].apply(lambda x: volume.get(x))
-    '''
 
     df['currentPriceDay'] = None
     df['stockVolumeDay'] = None
@@ -144,7 +126,7 @@ def add_price(df, tickers):
     return df
 
 
-def run_program(export_dir_path='/home/pi/Documents/data/options_daily/'):
+def run_program(export_dir_path='/home/pi/Documents/data/options_daily'):
     current = datetime.datetime.now(tz=utc)
     weekno = datetime.datetime.today().weekday()
     open_time = datetime.time(hour=14, minute=30)
@@ -155,31 +137,10 @@ def run_program(export_dir_path='/home/pi/Documents/data/options_daily/'):
         if not os.path.exists(f'{export_dir_path}/{str_dt}/'):
             os.makedirs(f'{export_dir_path}/{str_dt}/')
         file_name = current.strftime('%m_%d_%y-%H:%M')
-        # line = []
 
         inp = main()
 
-        # with open('/home/pi/Documents/data/check_file.csv', 'r') as fd:
-        #     try:
-        #         line = [x for x in csv.reader(fd)][0]
-        #         print(line)
-        #     except IndexError:
-        #         line = [x for x in csv.reader(fd)]
-        #     line.append(f'{file_name}.csv')
-        # with open('/home/pi/Documents/data/check_file.csv', 'w') as fd:
-        #     if isinstance(line, list):
-        #         print(line)
-        #         line = list(map(str.strip, line))
-        #         print(line)
-        #         fd.write(', '.join(line))
-        #     elif isinstance(line, str):
-        #         fd.write(line)
-        #     else:
-        #         print('line was not string or list')
-        #         print(f'line was of type {type(line)}')
-        #         print(f'contents of line were {line}')
-
-        with open(f'/home/pi/Documents/data/options_daily/{str_dt}/{file_name}.csv', 'w')as f:
+        with open(f'{export_dir_path}/{str_dt}/{file_name}.csv', 'w')as f:
             inp.to_csv(f)
         print('****************************************************************')
         print('*                                                              *')
@@ -196,4 +157,4 @@ def run_program(export_dir_path='/home/pi/Documents/data/options_daily/'):
         print('****************************************************************')
 
 
-run_program()
+run_program('/Daily-Option-Pulling-Tool')
