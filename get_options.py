@@ -157,4 +157,4 @@ def run_program(export_dir_path='/home/pi/Documents/data/options_daily'):
         print('****************************************************************')
 
 
-run_program('/Daily-Option-Pulling-Tool')
+run_program()
