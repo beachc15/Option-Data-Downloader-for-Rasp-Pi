@@ -4,7 +4,6 @@ import datetime
 import yfinance as yf
 import csv
 from pytz import utc
-import json
 
 __author__ = "Charles Beach"
 __credits__ = "Charles Beach"
@@ -16,18 +15,31 @@ __status__ = "Development"
 
 
 def end_of_day_collection():
+	def fix_names(my_df):
+		"""Designed to change the names of each column from multiIndex to tuple"""
+		out_col = []
+		columns = my_df.columns
+		for col in columns:
+			out_col.append(str(col))
+
+		my_df.columns = out_col
+		return my_df
+
+	ticker_str = '/home/pi/python_projects/python_prod/rasbpi_options/tickers.csv'
 	current = datetime.datetime.now(tz=utc)
 	weekno = datetime.datetime.today().weekday()
 	if (21 <= current.hour < 24) and weekno < 5:
 		dt = current.strftime('%Y-%m-%d')
 
-		with open('/home/pi/python_projects/python_prod/rasbpi_options/tickers.csv') as f:
+		with open(ticker_str) as f:
 			for tickers in csv.reader(f):
 				_ = tickers
 		# export = {'date': dt, 'data': yf.download(tickers, interval='5m', start=dt).to_json()}
 		open_str = f"/home/pi/Documents/data/EOD_prices/{dt}.csv"
 		with open(open_str, 'w') as f:
-			yf.download(tickers, interval='5m', start=dt).to_csv(f)
+			df = yf.download(tickers, interval='5m', start=dt)
+			df = fix_names(df)
+			df.to_csv(f)
 		print()
 		print()
 		print('***********************')
@@ -45,4 +57,5 @@ def end_of_day_collection():
 		print('***********************')
 
 
-end_of_day_collection()
+if __name__ == '__main__':
+	end_of_day_collection()
