@@ -53,19 +53,21 @@ def main():
             if weekday_ > friday_int:
                 # it is a weekend. Set day to Friday
                 weekday_ = friday_int
-                cur_date = datetime.date.fromisocalendar(year=year_, week=week_, day=weekday_)
+                cur_date = datetime.date.fromisocalendar(
+                    year=year_, week=week_, day=weekday_)
                 print(cur_date)
             warnings.warn(
                 "Program not being run on a Friday. Please correct CRONTAB settings.",
                 UserWarning,
                 stacklevel=1
-                )
+            )
 
         else:
             friday_check = True
 
         # Monday is known as integer 1 in the isocalendar format
-        this_monday_date = datetime.date.fromisocalendar(year=year_, week=week_, day=1)
+        this_monday_date = datetime.date.fromisocalendar(
+            year=year_, week=week_, day=1)
 
         # At this point we have our timeframe with cur_date being the end date and this_monday_date being the start
         return this_monday_date, cur_date
@@ -87,7 +89,8 @@ def main():
         year, week, week_no_start = start_.isocalendar()
         _, _, week_no_end = end_.isocalendar()
         # below we create the list of dates to run our walk function on
-        date_list = [datetime.date.fromisocalendar(year=year, week=week, day=x).strftime('%m_%d_%y') for x in range(week_no_start, week_no_end + 1)]
+        date_list = [datetime.date.fromisocalendar(year=year, week=week, day=x).strftime(
+            '%m_%d_%y') for x in range(week_no_start, week_no_end + 1)]
         # ****** Get list of files *******
         for date in date_list:
             date_path = f'{my_dir_path}/{date}'
@@ -129,7 +132,8 @@ def main():
                 # Weirdly this works for instantiating the tickers object. I know its inefficient but meh.
 
         # Download data from yfinance
-        df_out = yf.download(tickers=tickers_, start=start_, end=end_, interval='1m')
+        df_out = yf.download(tickers=tickers_, start=start_,
+                             end=end_, interval='1m')
         return df_out[['Adj Close', 'Volume']]
 
     def alter_csv(price_vol_df, file_str_):
@@ -162,8 +166,10 @@ def main():
             :param file_str__:
             :return:
             """
-            hour_and_minute = list(map(int, (file_str__.split('-')[-1].split('.')[0].split(':'))))
-            time_obj = datetime.time(hour=hour_and_minute[0], minute=hour_and_minute[1])
+            hour_and_minute = list(
+                map(int, (file_str__.split('-')[-1].split('.')[0].split(':'))))
+            time_obj = datetime.time(
+                hour=hour_and_minute[0], minute=hour_and_minute[1])
             return time_obj
 
         confirmed_match = False
@@ -194,20 +200,24 @@ def main():
             # confirmed_match is the index of the row in the stock prices dataframe which we need to use
             # I should make the next part a "try.. except" method but I want to see what happens this way first
 
-            #if not confirmed_match:
+            # if not confirmed_match:
            #     raise KeyError(f'confirmed_match did not find a match with time {my_time}')
-            adj_close_dict = price_vol_df.loc[confirmed_match]['Adj Close'].to_dict()
+            adj_close_dict = price_vol_df.loc[confirmed_match]['Adj Close'].to_dict(
+            )
             volume_dict = price_vol_df.loc[confirmed_match]['Volume'].to_dict()
 
             # **CLEAN**
             # this part is entirely fixing the ticker portion that says "BRKB instead of BRK-B"
-            search_str = r'^BRKB' 
+            search_str = r'^BRKB'
             df['ticker'] = df['ticker'].str.replace(pat='BRKB', repl='BRK-B')
             # **Transformation**
-            df['currentPriceDay'] = df['ticker'].apply(lambda x: adj_close_dict.get(x))
-            df['stockVolumeDay'] = df['ticker'].apply(lambda x: volume_dict.get(x))
+            df['currentPriceDay'] = df['ticker'].apply(
+                lambda x: adj_close_dict.get(x))
+            df['stockVolumeDay'] = df['ticker'].apply(
+                lambda x: volume_dict.get(x))
 
-            df['pctPriceDiff'] = df.apply(lambda x: price_delta_in_pct(x['strike'], x['currentPriceDay'], x['ticker']), axis=1)
+            df['pctPriceDiff'] = df.apply(lambda x: price_delta_in_pct(
+                x['strike'], x['currentPriceDay'], x['ticker']), axis=1)
 
             df.to_csv(path_or_buf=file_str_)
         except KeyError:
