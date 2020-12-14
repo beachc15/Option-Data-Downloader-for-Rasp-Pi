@@ -157,9 +157,10 @@ def run_program(export_dir_path='/home/pi/Documents/data/options_daily'):
         print('*                                                               *')
         print('****************************************************************')
 
+
 if __name__ == "__main__":
     error_count = 0
-    try: 
+    try:
         run_program()
     except exceptions.ChunkedEncodingError:
         if error_count < 2:
