@@ -5,6 +5,7 @@ import os
 import json
 import csv
 import datetime
+from requests import exceptions
 import pandas as pd
 import yfinance as yf
 from tqdm import tqdm
@@ -156,5 +157,11 @@ def run_program(export_dir_path='/home/pi/Documents/data/options_daily'):
         print('*                                                               *')
         print('****************************************************************')
 
-
-run_program()
+if __name__ == "__main__":
+    error_count = 0
+    try: 
+        run_program()
+    except exceptions.ChunkedEncodingError:
+        if error_count < 2:
+            run_program()
+            error_count += 1
