@@ -44,7 +44,8 @@ def main(ticker_path='/home/pi/python_projects/python_prod/rasbpi_options/ticker
     errors = 0
     total = 0
     this_time_export_data = {}
-    now = datetime.datetime.now(tz=utc).strftime('%m_%d_%y-%H:%M')
+    now_obj = datetime.datetime.now(tz=utc)
+    now = now_obj.strftime('%m_%d_%y-%H:%M')
     for ticker in tqdm(tickers):
         df_out_final = pd.DataFrame()
         this_ticker_export_data = {}
@@ -67,7 +68,7 @@ def main(ticker_path='/home/pi/python_projects/python_prod/rasbpi_options/ticker
                 this_ticker_export_data[expiration] = this_expiration_export_data
                 df_out = this_expiration_export_data['call'].append(
                     this_expiration_export_data['put'])
-                df_out['myDateTime'] = datetime.datetime.now(tz=utc)
+                df_out['myDateTime'] = now
 
                 expiration_split = list(map(int, expiration.split('-')))
                 df_out['expiration'] = datetime.date(year=expiration_split[0], month=expiration_split[1],
@@ -111,6 +112,7 @@ def add_price(df, tickers):
             """returns the amount of time left until expiration as a fraction of a year (365 days)"""
             from datetime import time, datetime
             if (expiration_dt, current_dt) not in cache:
+                current_dt = datetime.strptime(current_dt, '%m_%d_%y-%H:%M').replace(tzinfo=utc)
                 time_delta = datetime.combine(
                     expiration_dt, time(hour=10), tzinfo=utc) - current_dt
                 seconds = time_delta.seconds
