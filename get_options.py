@@ -162,16 +162,8 @@ if __name__ == "__main__":
     import http
     import urllib3
     error_count = 0
-<<<<<<< HEAD
-<<<<<<< Updated upstream
-    try: 
-=======
     max_err = 3
     try:
->>>>>>> Stashed changes
-=======
-    try:
->>>>>>> 532d43af43ffb04ae2efb8ff32aa178ecb16bc84
         run_program()
     except exceptions.ChunkedEncodingError:
         print("Encountered ChunkedEncodingError")
