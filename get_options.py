@@ -159,7 +159,7 @@ def run_program(export_dir_path='/home/pi/Documents/data/options_daily'):
 
 
 if __name__ == "__main__":
-    import http
+    from http import client
     import urllib3
     error_count = 0
     max_err = 3
@@ -170,7 +170,7 @@ if __name__ == "__main__":
         if error_count < max_err:
             run_program()
             error_count += 1
-    except http.client.IncompleteRead:
+    except client.IncompleteRead:
         print("Encountered Incomplete Read")
         if error_count < max_err:
             run_program()
@@ -180,4 +180,3 @@ if __name__ == "__main__":
         if error_count < max_err:
             run_program()
             error_count += 1
-            
