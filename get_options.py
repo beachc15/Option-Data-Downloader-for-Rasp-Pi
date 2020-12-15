@@ -159,10 +159,24 @@ def run_program(export_dir_path='/home/pi/Documents/data/options_daily'):
 
 
 if __name__ == "__main__":
+    from http import client
+    import urllib3
     error_count = 0
+    max_err = 3
     try:
         run_program()
     except exceptions.ChunkedEncodingError:
-        if error_count < 2:
+        print("Encountered ChunkedEncodingError")
+        if error_count < max_err:
+            run_program()
+            error_count += 1
+    except client.IncompleteRead:
+        print("Encountered Incomplete Read")
+        if error_count < max_err:
+            run_program()
+            error_count += 1
+    except urllib3.exceptions.ProtocolError:
+        print("Encountered Protocol Error")
+        if error_count < max_err:
             run_program()
             error_count += 1
