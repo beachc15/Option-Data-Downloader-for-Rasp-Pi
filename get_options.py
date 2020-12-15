@@ -47,53 +47,53 @@ def main(ticker_path='/home/pi/python_projects/python_prod/rasbpi_options/ticker
     now_obj = datetime.datetime.now(tz=utc)
     now = now_obj.strftime('%m_%d_%y-%H:%M')
     for ticker in tqdm(tickers):
-        df_out_final = pd.DataFrame()
+        df_out = pd.DataFrame()
         this_ticker_export_data = {}
         this_yf_object = yf.Ticker(ticker)
         expiration_list = this_yf_object.options
         for expiration in expiration_list[0:10]:
-            this_expiration_export_data = {}
+            local_worksheet_df = {}
             total += 1
             try:
-                this_yf_object_option_chain = this_yf_object.option_chain(
+                option_chain_df = this_yf_object.option_chain(
                     expiration)
-                this_yf_object_option_chain_indexed = keep_index(
-                    this_yf_object_option_chain)
-                this_expiration_export_data['call'] = pd.DataFrame(this_yf_object_option_chain_indexed[0]).drop(
+                option_chain_df_with_index = keep_index(
+                    option_chain_df)
+                local_worksheet_df['call'] = pd.DataFrame(option_chain_df_with_index[0]).drop(
                     ['percentChange', 'inTheMoney', 'currency', 'contractSize'], axis=1)
-                this_expiration_export_data['call']['optType'] = 'c'
-                this_expiration_export_data['put'] = pd.DataFrame(this_yf_object_option_chain_indexed[1]).drop(
+                local_worksheet_df['call']['optType'] = 'c'
+                local_worksheet_df['put'] = pd.DataFrame(option_chain_df_with_index[1]).drop(
                     ['percentChange', 'inTheMoney', 'currency', 'contractSize'], axis=1)
-                this_expiration_export_data['put']['optType'] = 'p'
-                this_ticker_export_data[expiration] = this_expiration_export_data
-                df_out = this_expiration_export_data['call'].append(
-                    this_expiration_export_data['put'])
-                df_out['myDateTime'] = now
+                local_worksheet_df['put']['optType'] = 'p'
+                local_df_for_export = local_worksheet_df['call'].append(
+                    local_worksheet_df['put'])
+                local_df_for_export['myDateTime'] = now
 
                 expiration_split = list(map(int, expiration.split('-')))
-                df_out['expiration'] = datetime.date(year=expiration_split[0], month=expiration_split[1],
+                local_df_for_export['expiration'] = datetime.date(year=expiration_split[0], month=expiration_split[1],
                                                      day=expiration_split[2])
-                df_out['uid'] = df_out['contractSymbol'] + '-' + now
-                df_out = df_out.set_index('uid')
+                local_df_for_export['uid'] = local_df_for_export['contractSymbol'] + '-' + now
+                local_df_for_export = local_df_for_export.set_index('uid')
 
                 # Use an if statement to see if the final dataframe is empty, if it is then instantiate it,
                 # if it isnt then just append
-                if len(df_out_final) == 0:
-                    df_out_final = df_out
+                if len(df_out) == 0:
+                    df_out = local_df_for_export
                 else:
-                    df_out_final = df_out_final.append(df_out)          # df_out now overwrites so we need a new df_out
+                    df_out = df_out.append(local_df_for_export)          # local_df_for_export now overwrites so we
+                    # need a new df_out
 
             except json.decoder.JSONDecodeError:
                 errors += 1
                 if errors >= 100:
                     print(errors)
         # This is my way of making sure my CSV file has headers while not trying to hold the whole thing in memory
-        # TODO add below lines to the try statement to avoid the chance of an empty df_out
+        # TODO add below lines to the try statement to avoid the chance of an empty local_df_for_export
         i += 1
         if i == 1:
-            this_time_export_data = df_out_final
+            this_time_export_data = df_out
         else:
-            this_time_export_data = this_time_export_data.append(df_out_final)
+            this_time_export_data = this_time_export_data.append(df_out)
     add_price(this_time_export_data, tickers)
     return this_time_export_data
 
@@ -112,14 +112,14 @@ def add_price(df, tickers):
             """returns the amount of time left until expiration as a fraction of a year (365 days)"""
             from datetime import time, datetime
             if (expiration_dt, current_dt) not in cache:
-                current_dt = datetime.strptime(current_dt, '%m_%d_%y-%H:%M').replace(tzinfo=utc)
+                current_dt_as_obj = datetime.strptime(current_dt, '%m_%d_%y-%H:%M').replace(tzinfo=utc)
                 time_delta = datetime.combine(
-                    expiration_dt, time(hour=10), tzinfo=utc) - current_dt
+                    expiration_dt, time(hour=10), tzinfo=utc) - current_dt_as_obj
                 seconds = time_delta.seconds
                 seconds_as_part_of_day = seconds / 86400
                 time_delta_float = round(
                     (float(time_delta.days) + seconds_as_part_of_day) / 365, 6)
-                cache[(expiration_dt, current_dt)] = time_delta_float
+                cache[(expiration_dt, current_dt_as_obj)] = time_delta_float
             else:
                 time_delta_float = cache[(expiration_dt, current_dt)]
             return time_delta_float
