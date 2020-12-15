@@ -46,6 +46,7 @@ def main(ticker_path='/home/pi/python_projects/python_prod/rasbpi_options/ticker
     this_time_export_data = {}
     now = datetime.datetime.now(tz=utc).strftime('%m_%d_%y-%H:%M')
     for ticker in tqdm(tickers):
+        df_out_final = pd.DataFrame()
         this_ticker_export_data = {}
         this_yf_object = yf.Ticker(ticker)
         expiration_list = this_yf_object.options
@@ -74,6 +75,13 @@ def main(ticker_path='/home/pi/python_projects/python_prod/rasbpi_options/ticker
                 df_out['uid'] = df_out['contractSymbol'] + '-' + now
                 df_out = df_out.set_index('uid')
 
+                # Use an if statement to see if the final dataframe is empty, if it is then instantiate it,
+                # if it isnt then just append
+                if len(df_out_final) == 0:
+                    df_out_final = df_out
+                else:
+                    df_out_final = df_out_final.append(df_out)          # df_out now overwrites so we need a new df_out
+
             except json.decoder.JSONDecodeError:
                 errors += 1
                 if errors >= 100:
@@ -82,9 +90,9 @@ def main(ticker_path='/home/pi/python_projects/python_prod/rasbpi_options/ticker
         # TODO add below lines to the try statement to avoid the chance of an empty df_out
         i += 1
         if i == 1:
-            this_time_export_data = df_out
+            this_time_export_data = df_out_final
         else:
-            this_time_export_data = this_time_export_data.append(df_out)
+            this_time_export_data = this_time_export_data.append(df_out_final)
     add_price(this_time_export_data, tickers)
     return this_time_export_data
 
