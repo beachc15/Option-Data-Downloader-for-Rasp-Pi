@@ -103,6 +103,7 @@ def main():
         :type file_str_: str
         :return:
         """
+
         # data function
         def price_delta_in_pct(strike, current_price, ticker):
             """
@@ -114,9 +115,9 @@ def main():
             round_int = 7
             if ticker == 'BRKB':
                 ticker = 'BRK-B'
-#            print('strike: ', strike)
-#            print('ticker: ', ticker)
-#            print('current price: ', current_price)
+            #            print('strike: ', strike)
+            #            print('ticker: ', ticker)
+            #            print('current price: ', current_price)
             pct_change = (strike - current_price) / current_price
             return pct_change
 
@@ -147,10 +148,10 @@ def main():
         try:
             for ind in price_vol_df.index:
                 ind_match = ind.astimezone(utc)
-#                print('************')
-#                print('my time: ', my_time)
-#                print('time to match: ', ind_match.time())
-#                print('*************')
+                #                print('************')
+                #                print('my time: ', my_time)
+                #                print('time to match: ', ind_match.time())
+                #                print('*************')
                 if ind_match.time() == my_time:
                     # confirmed_match is stored as a UNIX timestamp (I think)
                     # TODO confirm line 122
@@ -161,7 +162,7 @@ def main():
             # I should make the next part a "try.. except" method but I want to see what happens this way first
 
             # if not confirmed_match:
-           #     raise KeyError(f'confirmed_match did not find a match with time {my_time}')
+            #     raise KeyError(f'confirmed_match did not find a match with time {my_time}')
             adj_close_dict = price_vol_df.loc[confirmed_match]['Adj Close'].to_dict(
             )
             volume_dict = price_vol_df.loc[confirmed_match]['Volume'].to_dict()
@@ -193,6 +194,7 @@ def main():
     # As of right now I think I am going to pass it into a for loop for each of the file strings in file_list
     # and pass a function that actually goes in and makes the required alteration of the CSV.
     #       I won't be able to bug-check this on my windows machine
+
 
 def get_dates():
     """
@@ -232,6 +234,7 @@ def get_dates():
 
     # At this point we have our timeframe with cur_date being the end date and this_monday_date being the start
     return this_monday_date, cur_date
+
 
 if __name__ == '__main__':
     main()
