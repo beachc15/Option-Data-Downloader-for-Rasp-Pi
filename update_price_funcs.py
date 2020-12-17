@@ -33,45 +33,6 @@ def main():
     :return:
     """
 
-    def get_dates():
-        """
-        Finds today's date and finds monday of this week. Returns both as datetime objects
-        :return:
-        """
-        # find latest date in directory
-        # take that date (end date), convert to datetime object, check day of week, find monday of that week,
-        # set monday as start time
-        # using CRONTAB this should only be run on fridays but this will work for error handling
-        friday_check = False
-        friday_int = 5
-
-        cur_date = datetime.datetime.now(tz=utc).date()
-        year_, week_, weekday_ = cur_date.isocalendar()
-
-        # check day of week. If the day is not friday then throw a warning but continue running.
-        if weekday_ != friday_int:
-            if weekday_ > friday_int:
-                # it is a weekend. Set day to Friday
-                weekday_ = friday_int
-                cur_date = datetime.date.fromisocalendar(
-                    year=year_, week=week_, day=weekday_)
-                print(cur_date)
-            warnings.warn(
-                "Program not being run on a Friday. Please correct CRONTAB settings.",
-                UserWarning,
-                stacklevel=1
-            )
-
-        else:
-            friday_check = True
-
-        # Monday is known as integer 1 in the isocalendar format
-        this_monday_date = datetime.date.fromisocalendar(
-            year=year_, week=week_, day=1)
-
-        # At this point we have our timeframe with cur_date being the end date and this_monday_date being the start
-        return this_monday_date, cur_date
-
     def peruse_dir(start_, end_, my_dir_path="/home/pi/Documents/data/options_daily"):
         """
         Finds every file within the directories labeled within the start and end date parameters.
@@ -96,13 +57,12 @@ def main():
             date_path = f'{my_dir_path}/{date}'
             try:
                 os.chdir(date_path)
-                for root, dirs, files in os.walk(".", topdown=False):
+                for root, _, files in os.walk(".", topdown=False):
                     print(root)
                     for name in files:
                         files_list.append(os.path.join(date_path, name))
             except FileNotFoundError:
                 warnings.warn(f'Dir not found \'{date_path}\'.', RuntimeWarning)
-                pass
 
         # Checked this function on a windows machine. Have yet to check on my actual raspberry pi
         print('***********************\n\n')
@@ -234,6 +194,44 @@ def main():
     # and pass a function that actually goes in and makes the required alteration of the CSV.
     #       I won't be able to bug-check this on my windows machine
 
+def get_dates():
+    """
+    Finds today's date and finds monday of this week. Returns both as datetime objects
+    :return:
+    """
+    # find latest date in directory
+    # take that date (end date), convert to datetime object, check day of week, find monday of that week,
+    # set monday as start time
+    # using CRONTAB this should only be run on fridays but this will work for error handling
+    friday_check = False
+    friday_int = 5
+
+    cur_date = datetime.datetime.now(tz=utc).date()
+    year_, week_, weekday_ = cur_date.isocalendar()
+
+    # check day of week. If the day is not friday then throw a warning but continue running.
+    if weekday_ != friday_int:
+        if weekday_ > friday_int:
+            # it is a weekend. Set day to Friday
+            weekday_ = friday_int
+            cur_date = datetime.date.fromisocalendar(
+                year=year_, week=week_, day=weekday_)
+            print(cur_date)
+        warnings.warn(
+            "Program not being run on a Friday. Please correct CRONTAB settings.",
+            UserWarning,
+            stacklevel=1
+        )
+
+    else:
+        friday_check = True
+
+    # Monday is known as integer 1 in the isocalendar format
+    this_monday_date = datetime.date.fromisocalendar(
+        year=year_, week=week_, day=1)
+
+    # At this point we have our timeframe with cur_date being the end date and this_monday_date being the start
+    return this_monday_date, cur_date
 
 if __name__ == '__main__':
     main()
