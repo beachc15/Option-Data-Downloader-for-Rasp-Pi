@@ -179,7 +179,7 @@ def main():
 
             df['pctPriceDiff'] = df.apply(lambda x: price_delta_in_pct(
                 x['strike'], x['currentPriceDay'], x['ticker']), axis=1)
-
+            df = df.round(7)
             df.to_csv(path_or_buf=file_str_)
         except KeyError:
             print('KeyError')

@@ -152,6 +152,7 @@ def run_program(export_dir_path='/home/pi/Documents/data/options_daily'):
         inp = main()
 
         with open(f'{export_dir_path}/{str_dt}/{file_name}.csv', 'w')as f:
+            inp = inp.round(7)
             inp.to_csv(f)
         print('****************************************************************')
         print('*                                                              *')
