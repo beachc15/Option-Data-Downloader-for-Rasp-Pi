@@ -19,7 +19,6 @@ __maintainer__ = "Charles Beach"
 __email__ = "beachc15@gmail.com"
 __status__ = "Development"
 
-
 def keep_index(my_list_of_options):
     """ Keep only the middle 50% of rows in the dataframe
     The reasoning for this is that the most in the money and most out of the money options will
