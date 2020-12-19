@@ -30,7 +30,7 @@ def end_of_day_collection():
     current = datetime.datetime.now(tz=utc)
     # weekno = datetime.datetime.today().weekday()
     year_, week_, weekday_ = current.isocalendar()
-    if (21 <= current.hour < 24) and weekday_ < 6:
+    if (1 <= current.hour < 24) and weekday_ < 7:
         dt = current.strftime('%Y-%m-%d')
 
         with open(ticker_str) as f:
@@ -42,7 +42,9 @@ def end_of_day_collection():
         with open(open_str, 'w') as f:
             df = yf.download(tickers, interval='5m', start=start_, end=end_)
             df = fix_names(df)
+            df = df.round(4)
             df.to_csv(f)
+            # TODO why does this work when i run it directly but now with crontab?
         print()
         print()
         print('***********************')
