@@ -1,3 +1,6 @@
+# Status
+*I want to do all of these things but I only have so much time and frankly I need to focus on building my actual analysis work flow. The data is flowing right now without error so I will come back to this after I feel happy with the [daily option analysis](https://github.com/beachc15/daily-option-analysis) project (maybe never)*
+
 # Option-Data-Downloader-for-Rasp-Pi
 Tool for building an options dataset written in Python for deployment on the Raspberry Pi. 
 
@@ -38,4 +41,4 @@ Tool for building an options dataset written in Python for deployment on the Ras
 - Save data only when a change is detected to save space. This is easy to implement but I am too afraid of losing the data on accident
 - Create output options to SQL, CSV and mongodb
 
-*I want to do all of these things but I only have so much time and frankly I need to focus on building my actual analysis work flow. The data is flowing right now without error so I will come back to this after I feel happy with the [daily option analysis](https://github.com/beachc15/daily-option-analysis) project (maybe never)*
+
