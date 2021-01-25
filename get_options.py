@@ -148,7 +148,7 @@ def run_program(export_dir_path='/home/pi/Documents/data/options_daily'):
 
         if not os.path.exists(f'{export_dir_path}/{str_dt}/'):
             os.makedirs(f'{export_dir_path}/{str_dt}/')
-        file_name = current.strftime('%m_%d_%y-%H:%M')
+        file_name = current.strftime('%m_%d_%y-%H?%M')
 
         inp = main()
 
