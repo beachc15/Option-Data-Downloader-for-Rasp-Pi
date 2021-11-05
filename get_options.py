@@ -52,42 +52,49 @@ def main(ticker_path='/home/pi/python_projects/python_prod/rasbpi_options/ticker
         this_ticker_export_data = {}
         this_yf_object = yf.Ticker(ticker)
         expiration_list = this_yf_object.options
-        for expiration in expiration_list[0:10]:
-            local_worksheet_df = {}
-            total += 1
-            try:
-                option_chain_df = this_yf_object.option_chain(
-                    expiration)
-                option_chain_df_with_index = keep_index(
-                    option_chain_df)
-                local_worksheet_df['call'] = pd.DataFrame(option_chain_df_with_index[0]).drop(
-                    ['percentChange', 'inTheMoney', 'currency', 'contractSize'], axis=1)
-                local_worksheet_df['call']['optType'] = 'c'
-                local_worksheet_df['put'] = pd.DataFrame(option_chain_df_with_index[1]).drop(
-                    ['percentChange', 'inTheMoney', 'currency', 'contractSize'], axis=1)
-                local_worksheet_df['put']['optType'] = 'p'
-                local_df_for_export = local_worksheet_df['call'].append(
-                    local_worksheet_df['put'])
-                local_df_for_export['myDateTime'] = now
+        try:
+            for expiration in expiration_list[0:10]:
+                local_worksheet_df = {}
+                total += 1
+                try:
+                    option_chain_df = this_yf_object.option_chain(
+                        expiration)
+                    option_chain_df_with_index = keep_index(
+                        option_chain_df)
+                    local_worksheet_df['call'] = pd.DataFrame(option_chain_df_with_index[0]).drop(
+                        ['percentChange', 'inTheMoney', 'currency', 'contractSize'], axis=1)
+                    local_worksheet_df['call']['optType'] = 'c'
+                    local_worksheet_df['put'] = pd.DataFrame(option_chain_df_with_index[1]).drop(
+                        ['percentChange', 'inTheMoney', 'currency', 'contractSize'], axis=1)
+                    local_worksheet_df['put']['optType'] = 'p'
+                    local_df_for_export = local_worksheet_df['call'].append(
+                        local_worksheet_df['put'])
+                    local_df_for_export['myDateTime'] = now
 
-                expiration_split = list(map(int, expiration.split('-')))
-                local_df_for_export['expiration'] = datetime.date(year=expiration_split[0], month=expiration_split[1],
-                                                     day=expiration_split[2])
-                local_df_for_export['uid'] = local_df_for_export['contractSymbol'] + '-' + now
-                local_df_for_export = local_df_for_export.set_index('uid')
+                    expiration_split = list(map(int, expiration.split('-')))
+                    local_df_for_export['expiration'] = datetime.date(year=expiration_split[0], month=expiration_split[1],
+                                                         day=expiration_split[2])
+                    local_df_for_export['uid'] = local_df_for_export['contractSymbol'] + '-' + now
+                    local_df_for_export = local_df_for_export.set_index('uid')
 
-                # Use an if statement to see if the final dataframe is empty, if it is then instantiate it,
-                # if it isnt then just append
-                if len(df_out) == 0:
-                    df_out = local_df_for_export
-                else:
-                    df_out = df_out.append(local_df_for_export)          # local_df_for_export now overwrites so we
-                    # need a new df_out
+                    # Use an if statement to see if the final dataframe is empty, if it is then instantiate it,
+                    # if it isnt then just append
+                    if len(df_out) == 0:
+                        df_out = local_df_for_export
+                    else:
+                        df_out = df_out.append(local_df_for_export)          # local_df_for_export now overwrites so we
+                        # need a new df_out
 
-            except json.decoder.JSONDecodeError:
-                errors += 1
-                if errors >= 100:
-                    print(errors)
+                except json.decoder.JSONDecodeError:
+                    errors += 1
+                    if errors >= 100:
+                        print(errors)
+                
+                
+        except json.decoder.JSONDecodeError:
+            errors += 1
+            if errors >= 100:
+                print(errors)
         # This is my way of making sure my CSV file has headers while not trying to hold the whole thing in memory
         # TODO add below lines to the try statement to avoid the chance of an empty local_df_for_export
         i += 1
@@ -148,7 +155,7 @@ def run_program(export_dir_path='/home/pi/Documents/data/options_daily'):
 
         if not os.path.exists(f'{export_dir_path}/{str_dt}/'):
             os.makedirs(f'{export_dir_path}/{str_dt}/')
-        file_name = current.strftime('%m_%d_%y-%H?%M')
+        file_name = current.strftime('%m_%d_%y-%H-%M')
 
         inp = main()
 

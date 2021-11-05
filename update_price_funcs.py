@@ -66,8 +66,7 @@ def main():
 
         # Checked this function on a windows machine. Have yet to check on my actual raspberry pi
         print('***********************\n\n')
-        print('file names')
-        print(files_list)
+        print('running update_price_funcs')
         print('\n\n***********************')
         # first file should be a directory titled as the start_ date as a string in format(%m_%d_%y)
         # run a list for all datetime dates in between start and end, convert them to string and see if theres a
@@ -127,10 +126,15 @@ def main():
             :param file_str__:
             :return:
             """
-            hour_and_minute = list(
-                map(int, (file_str__.split('-')[-1].split('.')[0].split(':'))))
-            time_obj = datetime.time(
-                hour=hour_and_minute[0], minute=hour_and_minute[1])
+            try:
+                time_obj = datetime.time(
+                    hour=int(file_str__.split('-')[-2]),
+                    minute=int(file_str__.split('-')[-1].split('.')[0])
+                )
+
+            except ValueError:
+                print(file_str__)
+                quit()
             return time_obj
 
         confirmed_match = False
@@ -148,10 +152,10 @@ def main():
         try:
             for ind in price_vol_df.index:
                 ind_match = ind.astimezone(utc)
-                #                print('************')
-                #                print('my time: ', my_time)
-                #                print('time to match: ', ind_match.time())
-                #                print('*************')
+                print('************')
+                print('my time: ', my_time)
+                print('time to match: ', ind_match.time())
+                print('*************')
                 if ind_match.time() == my_time:
                     # confirmed_match is stored as a UNIX timestamp (I think)
                     # TODO confirm line 122
