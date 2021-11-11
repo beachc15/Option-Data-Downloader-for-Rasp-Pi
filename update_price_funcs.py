@@ -152,10 +152,6 @@ def main():
         try:
             for ind in price_vol_df.index:
                 ind_match = ind.astimezone(utc)
-                print('************')
-                print('my time: ', my_time)
-                print('time to match: ', ind_match.time())
-                print('*************')
                 if ind_match.time() == my_time:
                     # confirmed_match is stored as a UNIX timestamp (I think)
                     # TODO confirm line 122
